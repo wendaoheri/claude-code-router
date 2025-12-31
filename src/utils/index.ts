@@ -3,7 +3,7 @@ import readline from "node:readline";
 import JSON5 from "json5";
 import path from "node:path";
 import {
-  CONFIG_FILE,
+  getConfigFilePath,
   DEFAULT_CONFIG,
   HOME_DIR,
   PLUGINS_DIR,
@@ -67,6 +67,7 @@ const confirm = async (query: string): Promise<boolean> => {
 };
 
 export const readConfigFile = async () => {
+  const CONFIG_FILE = getConfigFilePath();
   try {
     const config = await fs.readFile(CONFIG_FILE, "utf-8");
     try {
@@ -124,6 +125,7 @@ export const readConfigFile = async () => {
 };
 
 export const backupConfigFile = async () => {
+  const CONFIG_FILE = getConfigFilePath();
   try {
     if (await fs.access(CONFIG_FILE).then(() => true).catch(() => false)) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -162,6 +164,7 @@ export const backupConfigFile = async () => {
 };
 
 export const writeConfigFile = async (config: any) => {
+  const CONFIG_FILE = getConfigFilePath();
   await ensureDir(HOME_DIR);
   const configWithComment = `${JSON.stringify(config, null, 2)}`;
   await fs.writeFile(CONFIG_FILE, configWithComment);

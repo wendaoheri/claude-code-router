@@ -12,14 +12,41 @@ import { runModelSelector } from "./utils/modelSelector"; // ADD THIS LINE
 import { activateCommand } from "./utils/activateCommand";
 import { version } from "../package.json";
 import { spawn, exec } from "child_process";
-import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
+import { PID_FILE, REFERENCE_COUNT_FILE, setConfigFilePath } from "./constants";
 import fs, { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
-const command = process.argv[2];
+// Parse command line arguments
+function parseArgs() {
+  const args = process.argv.slice(2);
+  let configPath: string | undefined;
+  let command: string | undefined;
+  let commandArgs: string[] = [];
+  
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--config' && i + 1 < args.length) {
+      configPath = args[i + 1];
+      i++; // Skip next arg
+    } else if (!command) {
+      command = args[i];
+    } else {
+      commandArgs.push(args[i]);
+    }
+  }
+  
+  return { command, configPath, commandArgs };
+}
+
+const { command, configPath, commandArgs } = parseArgs();
+
+// Set custom config path if provided
+if (configPath) {
+  setConfigFilePath(configPath);
+  console.log(`Using config file: ${configPath}`);
+}
 
 const HELP_TEXT = `
-Usage: ccr [command]
+Usage: ccr [command] [options]
 
 Commands:
   start         Start server
@@ -34,10 +61,14 @@ Commands:
   -v, version   Show version information
   -h, help      Show help information
 
+Options:
+  --config <path>   Specify custom config file path
+
 Example:
   ccr start
+  ccr start --config /path/to/config.json
   ccr code "Write a Hello World"
-  ccr model
+  ccr model --config ./my-config.json
   eval "$(ccr activate)"  # Set environment variables globally
   ccr ui
 `;
@@ -152,9 +183,8 @@ async function main() {
         startProcess.unref();
 
         if (await waitForService()) {
-          // Join all code arguments into a single string to preserve spaces within quotes
-          const codeArgs = process.argv.slice(3);
-          executeCodeCommand(codeArgs);
+          // Use parsed commandArgs instead of process.argv.slice(3)
+          executeCodeCommand(commandArgs);
         } else {
           console.error(
             "Service startup timeout, please manually run `ccr start` to start the service"
@@ -162,9 +192,8 @@ async function main() {
           process.exit(1);
         }
       } else {
-        // Join all code arguments into a single string to preserve spaces within quotes
-        const codeArgs = process.argv.slice(3);
-        executeCodeCommand(codeArgs);
+        // Use parsed commandArgs instead of process.argv.slice(3)
+        executeCodeCommand(commandArgs);
       }
       break;
     case "ui":

@@ -3,6 +3,18 @@ import os from "node:os";
 
 export const HOME_DIR = path.join(os.homedir(), ".claude-code-router");
 
+// Allow runtime override of config file path
+let _configFilePath: string | null = null;
+
+export function setConfigFilePath(filePath: string) {
+  _configFilePath = path.resolve(filePath);
+}
+
+export function getConfigFilePath(): string {
+  return _configFilePath || path.join(HOME_DIR, "config.json");
+}
+
+// For backward compatibility
 export const CONFIG_FILE = path.join(HOME_DIR, "config.json");
 
 export const PLUGINS_DIR = path.join(HOME_DIR, "plugins");

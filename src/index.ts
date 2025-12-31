@@ -11,7 +11,7 @@ import {
   isServiceRunning,
   savePid,
 } from "./utils/processCheck";
-import { CONFIG_FILE } from "./constants";
+import { getConfigFilePath } from "./constants";
 import { createStream } from 'rotating-file-stream';
 import { HOME_DIR } from "./constants";
 import { sessionUsageCache } from "./utils/cache";
@@ -47,6 +47,7 @@ async function initializeClaudeConfig() {
 
 interface RunOptions {
   port?: number;
+  configPath?: string;
 }
 
 async function run(options: RunOptions = {}) {
@@ -123,7 +124,7 @@ async function run(options: RunOptions = {}) {
       : false;
 
   const server = createServer({
-    jsonPath: CONFIG_FILE,
+    jsonPath: getConfigFilePath(),
     initialConfig: {
       // ...config,
       providers: config.Providers || config.providers,

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { execSync } from "child_process";
 import path from "node:path";
-import { CONFIG_FILE, HOME_DIR } from "../constants";
+import { getConfigFilePath, HOME_DIR } from "../constants";
 import JSON5 from "json5";
 
 export interface StatusLineModuleConfig {
@@ -312,7 +312,7 @@ function formatUsage(input_tokens: number, output_tokens: number): string {
 async function getProjectThemeConfig(): Promise<{ theme: StatusLineThemeConfig | null, style: string }> {
   try {
     // 只使用主目录的固定配置文件
-    const configPath = CONFIG_FILE;
+    const configPath = getConfigFilePath();
     
     // 检查配置文件是否存在
     try {
