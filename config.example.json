@@ -3,7 +3,7 @@
   "CLAUDE_PATH": "",
   "HOST": "0.0.0.0",
   "PORT": 3456,
-  "APIKEY": "",
+  "APIKEY": "sk-dummy",
   "API_TIMEOUT_MS": 600000,
   "NON_INTERACTIVE_MODE": false,
   "transformers": [],
